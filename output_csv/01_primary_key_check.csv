@@ -1,0 +1,6 @@
+table_name,primary_key,total_rows,unique_values,is_unique
+customers,customer_id,99441,99441.0,True
+orders,order_id,99441,99441.0,True
+order_items,No single primary key,112650,,
+products,product_id,32951,32951.0,True
+sellers,seller_id,3095,3095.0,True
