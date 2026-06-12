@@ -1,0 +1,2 @@
+table_name,primary_key,total_rows,unique_values,is_unique
+products,product_id,32951,32951,True

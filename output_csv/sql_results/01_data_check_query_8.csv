@@ -1,0 +1,2 @@
+table_name,primary_key,total_rows,unique_values,is_unique
+orders,order_id,99441,99441,True

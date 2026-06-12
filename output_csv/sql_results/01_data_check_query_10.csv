@@ -1,0 +1,2 @@
+table_name,primary_key,total_rows,unique_values,is_unique
+sellers,seller_id,3095,3095,True
