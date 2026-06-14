@@ -33,8 +33,9 @@ ORDER BY total_order_count DESC;
 
 
 -- 3. Top 3 categories by sales volume in January 2018
+-- Missing categories are labelled as 'Unknown'
 SELECT
-    p.product_category_name,
+    COALESCE(p.product_category_name, 'Unknown') AS product_category_name,
     COUNT(*) AS sales_count
 FROM orders o
 INNER JOIN order_items oi
@@ -43,6 +44,6 @@ LEFT JOIN products p
     ON oi.product_id = p.product_id
 WHERE o.order_purchase_timestamp >= '2018-01-01'
   AND o.order_purchase_timestamp < '2018-02-01'
-GROUP BY p.product_category_name
+GROUP BY COALESCE(p.product_category_name, 'Unknown')
 ORDER BY sales_count DESC
 LIMIT 3;

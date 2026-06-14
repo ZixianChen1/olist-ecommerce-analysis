@@ -4,18 +4,20 @@
 -- ============================================================
 
 -- 1. Total number of products and categories
+-- Missing categories are labelled as 'Unknown'
 SELECT
     COUNT(DISTINCT product_id) AS total_products,
-    COUNT(DISTINCT product_category_name) AS total_categories
+    COUNT(DISTINCT COALESCE(product_category_name, 'Unknown')) AS total_categories
 FROM products;
 
 
 -- 2. Product count by category
+-- Missing categories are labelled as 'Unknown'
 SELECT
-    product_category_name,
+    COALESCE(product_category_name, 'Unknown') AS product_category_name,
     COUNT(*) AS product_count
 FROM products
-GROUP BY product_category_name
+GROUP BY COALESCE(product_category_name, 'Unknown')
 ORDER BY product_count DESC;
 
 
@@ -30,23 +32,25 @@ ORDER BY sales_count DESC;
 
 
 -- 4. Category sales count
+-- Missing categories are labelled as 'Unknown'
 SELECT
-    p.product_category_name,
+    COALESCE(p.product_category_name, 'Unknown') AS product_category_name,
     COUNT(*) AS sales_count
 FROM order_items oi
 LEFT JOIN products p
     ON oi.product_id = p.product_id
-GROUP BY p.product_category_name
+GROUP BY COALESCE(p.product_category_name, 'Unknown')
 ORDER BY sales_count DESC;
 
 
 -- 5. Category revenue ranking
+-- Missing categories are labelled as 'Unknown'
 SELECT
-    p.product_category_name,
+    COALESCE(p.product_category_name, 'Unknown') AS product_category_name,
     SUM(oi.price) AS total_revenue,
     COUNT(oi.product_id) AS total_sales_count
 FROM order_items oi
 LEFT JOIN products p
     ON oi.product_id = p.product_id
-GROUP BY p.product_category_name
+GROUP BY COALESCE(p.product_category_name, 'Unknown')
 ORDER BY total_revenue DESC;

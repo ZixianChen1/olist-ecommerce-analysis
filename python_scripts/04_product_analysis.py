@@ -22,10 +22,30 @@ print("Products table shape:", products.shape)
 print("Order items table shape:", order_items.shape)
 
 # =========================
+# 2.1 Check and handle missing product categories
+# =========================
+
+# Check products with missing product category
+missing_category_products = products[products["product_category_name"].isnull()]
+
+print("Missing product category count:", len(missing_category_products))
+print("Is product_id unique in products table:", products["product_id"].is_unique)
+
+# Since product_id is unique in the products table,
+# missing categories cannot be recovered from another row with the same product_id.
+# Other fields, such as product name length, description length,
+# photo quantity, weight and size, are not enough to reliably infer the exact category.
+# Therefore, unrecoverable missing categories are labelled as "Unknown".
+products["product_category_name"] = products["product_category_name"].fillna("Unknown")
+
+# =========================
 # 3. Total number of products and categories
 # =========================
 
 total_products = products["product_id"].nunique()
+
+# After filling missing categories as "Unknown",
+# total_categories includes "Unknown" as one category.
 total_categories = products["product_category_name"].nunique()
 
 product_summary = pd.DataFrame({
@@ -63,8 +83,8 @@ print("Products by category saved.")
 # 5. Product sales ranking
 # =========================
 
-# order_items 表中每一行代表一个订单商品
-# 所以按 product_id 统计出现次数，可以理解为商品销量
+# order_items table has one row for each product item in an order.
+# Therefore, counting product_id can be used as product sales volume.
 product_sales_ranking = (
     order_items
     .groupby("product_id")
@@ -84,15 +104,22 @@ print("Product sales ranking saved.")
 # 6. Category sales ranking
 # =========================
 
-# 把 order_items 和 products 通过 product_id 关联
-# 这样每个订单商品就能对应到商品类目
+# Merge order_items with products by product_id.
+# This allows each order item to be linked with its product category.
 order_items_with_category = order_items.merge(
     products[["product_id", "product_category_name"]],
     on="product_id",
     how="left"
 )
 
-# 按类目统计销量
+# If there are product_ids in order_items that do not exist in products,
+# their categories will still be missing after the merge.
+# Label these remaining missing categories as "Unknown" as well.
+order_items_with_category["product_category_name"] = (
+    order_items_with_category["product_category_name"].fillna("Unknown")
+)
+
+# Count sales volume by product category
 category_sales_count = (
     order_items_with_category
     .groupby("product_category_name")
@@ -112,8 +139,8 @@ print("Category sales count saved.")
 # 7. Category revenue ranking
 # =========================
 
-# price 是商品销售金额
-# 按类目汇总 price，可以得到类目销售额
+# price is the product sales amount.
+# Summing price by category gives the total revenue of each product category.
 category_revenue_ranking = (
     order_items_with_category
     .groupby("product_category_name")
